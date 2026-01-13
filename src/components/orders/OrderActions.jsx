@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Download, SlidersHorizontal, Plus } from 'lucide-react';
 
-const OrderActions = ({ searchTerm, setSearchTerm, sortConfig, handleSortChange, totalOrders }) => {
+const OrderActions = ({ searchTerm, setSearchTerm, sortConfig, handleSortChange, totalOrders, onAddOrderClick }) => {
     return (
         <div className="flex justify-between items-center mb-6">
             <div className="flex items-center space-x-4 flex-1">
@@ -40,7 +40,10 @@ const OrderActions = ({ searchTerm, setSearchTerm, sortConfig, handleSortChange,
                     </div>
                 </div>
 
-                <button className="flex items-center px-4 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors shadow-lg">
+                <button
+                    onClick={onAddOrderClick}
+                    className="flex items-center px-4 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors shadow-lg"
+                >
                     <Plus className="w-4 h-4 mr-2" />
                     Add order
                 </button>

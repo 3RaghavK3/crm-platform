@@ -4,6 +4,7 @@ import OrderStatCards from '../components/orders/OrderStatCards';
 import OrderActions from '../components/orders/OrderActions';
 import OrderFilters from '../components/orders/OrderFilters';
 import OrdersTable from '../components/orders/OrdersTable';
+import AddOrderModal from '../components/orders/AddOrderModal';
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -12,6 +13,7 @@ const Orders = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filters, setFilters] = useState({ category: [], status: [] });
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'default' }); // 'asc', 'desc', 'default'
+    const [isAddOrderModalOpen, setIsAddOrderModalOpen] = useState(false);
 
     // Helper to generate random date within last year
     const getRandomDate = () => {
@@ -56,10 +58,10 @@ const Orders = () => {
             const deliveredOrdersCount = orders.filter(o => o.status === 'Delivered').length;
 
             const newStats = [
-                { title: 'New orders', count: newOrdersCount, change: '+2.67%', isPositive: true, bg: 'bg-blue-500', text: 'text-white' },
-                { title: 'Await accepting orders', count: awaitOrdersCount, change: '+2.67%', isPositive: true, bg: 'bg-orange-400', text: 'text-white' },
-                { title: 'On way orders', count: onWayOrdersCount, change: '-0.67%', isPositive: false, bg: 'bg-yellow-400', text: 'text-white' },
-                { title: 'Delivered orders', count: deliveredOrdersCount, change: '+2.87%', isPositive: true, bg: 'bg-green-400', text: 'text-white' },
+                { title: 'New orders', count: newOrdersCount, isPositive: true, bg: 'bg-blue-500', text: 'text-white' },
+                { title: 'Await accepting orders', count: awaitOrdersCount, isPositive: true, bg: 'bg-orange-400', text: 'text-white' },
+                { title: 'On way orders', count: onWayOrdersCount, isPositive: false, bg: 'bg-yellow-400', text: 'text-white' },
+                { title: 'Delivered orders', count: deliveredOrdersCount, isPositive: true, bg: 'bg-green-400', text: 'text-white' },
             ];
             setStats(newStats);
         };
@@ -139,6 +141,16 @@ const Orders = () => {
         setSearchTerm('');
     };
 
+    const handleAddOrder = (newOrder) => {
+        // Generate a simple ID based on existing ones or random if empty
+        const lastId = orders.length > 0 ? Math.max(...orders.map(o => parseInt(o.id))) : 674839;
+        const orderWithId = {
+            ...newOrder,
+            id: (lastId + 1).toString()
+        };
+        setOrders(prev => [orderWithId, ...prev]);
+    };
+
 
     return (
         <div className="flex-1 flex flex-col p-6 bg-gray-50 h-full overflow-y-auto">
@@ -150,6 +162,7 @@ const Orders = () => {
                 sortConfig={sortConfig}
                 handleSortChange={handleSortChange}
                 totalOrders={orders.length}
+                onAddOrderClick={() => setIsAddOrderModalOpen(true)}
             />
             <OrderFilters
                 filters={filters}
@@ -161,6 +174,11 @@ const Orders = () => {
             <OrdersTable
                 orders={filteredOrders}
                 handleStatusChange={handleStatusChange}
+            />
+            <AddOrderModal
+                isOpen={isAddOrderModalOpen}
+                onClose={() => setIsAddOrderModalOpen(false)}
+                onAddOrder={handleAddOrder}
             />
         </div>
     );
