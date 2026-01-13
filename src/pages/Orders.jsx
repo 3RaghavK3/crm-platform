@@ -17,18 +17,13 @@ const Orders = () => {
     const getRandomDate = () => {
         const start = new Date(2024, 0, 1);
         const end = new Date();
-        const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-        // Force format to DD.MM.YYYY
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+        return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
     };
 
     // Helper to generate random price
-    const getRandomPrice = () => (Math.random() * (2000 - 100) + 100).toFixed(2);
+    const getRandomPrice = () => parseFloat((Math.random() * (2000 - 100) + 100).toFixed(2));
 
-    // Initial Data Generation
+
     useEffect(() => {
         const categories = ['Laptops', 'Mobiles'];
         const payments = ['PayPal', 'Credit Card', 'Bank Transfer'];
@@ -36,7 +31,7 @@ const Orders = () => {
         const firstNames = ['Kris', 'John', 'Alice', 'Bob', 'Emma', 'David', 'Sarah', 'Mike'];
         const lastNames = ['Payer', 'Doe', 'Smith', 'Johnson', 'Brown', 'Davis', 'Wilson', 'Taylor'];
 
-        const generatedOrders = Array.from({ length: 20 }, (_, i) => ({
+        const generatedOrders = Array.from({ length: 7 }, (_, i) => ({
             id: (674839 + i).toString(),
             customer: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
             phone: '099 758 9092', // Static as requested to randomize "too for now" but detailed list was specific categories/dates/payments
@@ -101,30 +96,15 @@ const Orders = () => {
                 let bValue = b[sortConfig.key];
 
                 if (sortConfig.key === 'price') {
-                    aValue = parseFloat(aValue);
-                    bValue = parseFloat(bValue);
+                    return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
                 } else if (sortConfig.key === 'date') {
-                    // Parse DD.MM.YYYY to Date timestamp
-                    const [aDay, aMonth, aYear] = aValue.split('.').map(Number);
-                    const [bDay, bMonth, bYear] = bValue.split('.').map(Number);
-                    aValue = new Date(aYear, aMonth - 1, aDay).getTime();
-                    bValue = new Date(bYear, bMonth - 1, bDay).getTime();
+                    return sortConfig.direction === 'asc' ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime();
                 }
-
-                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-                return 0;
             });
         }
 
         setFilteredOrders(result);
     }, [orders, searchTerm, filters, sortConfig]);
-
-    const handleStatusChange = (id, newStatus) => {
-        setOrders(prevOrders => prevOrders.map(order =>
-            order.id === id ? { ...order, status: newStatus } : order
-        ));
-    };
 
     const handleSortChange = (key) => {
         setSortConfig(prev => {
@@ -136,6 +116,13 @@ const Orders = () => {
             return { key, direction: 'asc' };
         });
     };
+
+    const handleStatusChange = (id, newStatus) => {
+        setOrders(prevOrders => prevOrders.map(order =>
+            order.id === id ? { ...order, status: newStatus } : order
+        ));
+    };
+
 
     const toggleFilter = (type, value) => {
         setFilters(prev => {

@@ -38,8 +38,12 @@ const OrdersTable = ({ orders, handleStatusChange }) => {
                                 <div className="text-gray-400 text-xs mt-0.5">{order.phone}</div>
                             </td>
                             <td className="p-4 font-medium text-gray-900 vertical-top">{order.category}</td>
-                            <td className="p-4 font-medium text-gray-900 vertical-top">${order.price}</td>
-                            <td className="p-4 text-gray-600 vertical-top">{order.date}</td>
+                            <td className="p-4 font-medium text-gray-900 vertical-top">${typeof order.price === 'number' ? order.price.toFixed(2) : order.price}</td>
+                            <td className="p-4 text-gray-600 vertical-top">
+                                {order.date instanceof Date
+                                    ? order.date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.')
+                                    : order.date}
+                            </td>
                             <td className="p-4 text-gray-600 vertical-top">{order.payment}</td>
                             <td className="p-4 vertical-top">
                                 <select
