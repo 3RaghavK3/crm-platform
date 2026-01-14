@@ -73,7 +73,7 @@ const AddOrderModal = ({ isOpen, onClose, onAddOrder }) => {
                             <label className="text-sm font-medium text-gray-700">Mobile Number</label>
                             <input
                                 required
-                                type="text"
+                                type="tel"
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
@@ -104,12 +104,12 @@ const AddOrderModal = ({ isOpen, onClose, onAddOrder }) => {
                                 required
                                 type="number"
                                 name="price"
-                                step="0.01"
+                                step="1"
                                 min="0"
                                 value={formData.price}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400"
-                                placeholder="0.00"
+                                placeholder="5"
                             />
                         </div>
                     </div>
