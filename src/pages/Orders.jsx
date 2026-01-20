@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useOrders } from '../context/OrderContext';
 import OrderHeader from '../components/orders/OrderHeader';
 import OrderStatCards from '../components/orders/OrderStatCards';
 import OrderActions from '../components/orders/OrderActions';
@@ -7,7 +8,7 @@ import OrdersTable from '../components/orders/OrdersTable';
 import AddOrderModal from '../components/orders/AddOrderModal';
 
 const Orders = () => {
-    const [orders, setOrders] = useState([]);
+    const { orders, setOrders, addOrder } = useOrders(); // Use Global Orders
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [stats, setStats] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -15,39 +16,10 @@ const Orders = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'default' }); // 'asc', 'desc', 'default'
     const [isAddOrderModalOpen, setIsAddOrderModalOpen] = useState(false);
 
-    // Helper to generate random date within last year
-    const getRandomDate = () => {
-        const start = new Date(2024, 0, 1);
-        const end = new Date();
-        return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-    };
-
-    // Helper to generate random price
-    const getRandomPrice = () => parseFloat((Math.random() * (2000 - 100) + 100).toFixed(2));
-
-
+    // Initial load/sync with global orders
     useEffect(() => {
-        const categories = ['Laptops', 'Mobiles'];
-        const payments = ['PayPal', 'Credit Card', 'Bank Transfer'];
-        const statuses = ['New', 'Await', 'On way', 'Delivered'];
-        const firstNames = ['Kris', 'John', 'Alice', 'Bob', 'Emma', 'David', 'Sarah', 'Mike'];
-        const lastNames = ['Payer', 'Doe', 'Smith', 'Johnson', 'Brown', 'Davis', 'Wilson', 'Taylor'];
-
-        const generatedOrders = Array.from({ length: 7 }, (_, i) => ({
-            id: (674839 + i).toString(),
-            customer: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
-            phone: '099 758 9092', // Static as requested to randomize "too for now" but detailed list was specific categories/dates/payments
-            category: categories[Math.floor(Math.random() * categories.length)],
-            price: getRandomPrice(),
-            date: getRandomDate(),
-            payment: payments[Math.floor(Math.random() * payments.length)],
-            status: statuses[Math.floor(Math.random() * statuses.length)],
-            statusColor: '' // Will be set dynamically
-        }));
-
-        setOrders(generatedOrders);
-        setFilteredOrders(generatedOrders);
-    }, []);
+        setFilteredOrders(orders);
+    }, [orders]);
 
     // Calculate Stats
     useEffect(() => {
@@ -142,13 +114,7 @@ const Orders = () => {
     };
 
     const handleAddOrder = (newOrder) => {
-        // Generate a simple ID based on existing ones or random if empty
-        const lastId = orders.length > 0 ? Math.max(...orders.map(o => parseInt(o.id))) : 674839;
-        const orderWithId = {
-            ...newOrder,
-            id: (lastId + 1).toString()
-        };
-        setOrders(prev => [orderWithId, ...prev]);
+        addOrder(newOrder);
     };
 
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCustomers } from '../../context/CustomerContext';
 import { X } from 'lucide-react';
 
 const AddOrderModal = ({ isOpen, onClose, onAddOrder }) => {
@@ -12,11 +13,23 @@ const AddOrderModal = ({ isOpen, onClose, onAddOrder }) => {
         status: 'New'
     });
 
+    const { customers } = useCustomers();
+
     if (!isOpen) return null;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+
+        if (name === 'customer') {
+            const selectedCustomer = customers.find(c => c.name === value);
+            setFormData(prev => ({
+                ...prev,
+                customer: value,
+                phone: selectedCustomer ? selectedCustomer.phone : ''
+            }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleSubmit = (e) => {
@@ -59,15 +72,20 @@ const AddOrderModal = ({ isOpen, onClose, onAddOrder }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-gray-700">Customer Name</label>
-                            <input
+                            <select
                                 required
-                                type="text"
                                 name="customer"
                                 value={formData.customer}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400"
-                                placeholder="John Doe"
-                            />
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
+                            >
+                                <option value="">Select Customer</option>
+                                {customers.map(customer => (
+                                    <option key={customer.id} value={customer.name}>
+                                        {customer.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-gray-700">Mobile Number</label>
