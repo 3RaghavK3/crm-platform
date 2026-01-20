@@ -30,8 +30,8 @@ const Sidebar = () => {
                 <div
                   onClick={() => navigate(item.path)}
                   className={`w-full flex items-center cursor-pointer p-3 rounded-lg transition-colors duration-200 overflow-hidden whitespace-nowrap ${isActive
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-gray-600 hover:text-indigo-600'
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-600 hover:text-indigo-600'
                     }`}
                 >
                   <Icon className="w-6 h-6 min-w-[24px]" />

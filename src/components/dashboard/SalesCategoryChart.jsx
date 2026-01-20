@@ -6,26 +6,26 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const SalesCategoryChart = () => {
     const data = {
-        labels: ['Pencil', 'Pen', 'Eraser', 'Sharpener', 'Scale'],
+        labels: ['Electronics', 'Accessories', 'Mobiles', 'Laptops', 'Tablets'],
         datasets: [
             {
                 label: '# of Sales',
                 data: [12, 19, 3, 5, 2],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.8)',   // Red
-                    'rgba(54, 162, 235, 0.8)',   // Blue
-                    'rgba(255, 206, 86, 0.8)',   // Yellow
-                    'rgba(75, 192, 192, 0.8)',   // Teal
-                    'rgba(153, 102, 255, 0.8)',  // Purple
+                    '#3b82f6', // Blue-500
+                    '#4ade80', // Green-400
+                    '#facc15', // Yellow-400
+                    '#fb923c', // Orange-400
+                    '#818cf8', // Indigo-400
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
+                    '#ffffff',
+                    '#ffffff',
+                    '#ffffff',
+                    '#ffffff',
+                    '#ffffff',
                 ],
-                borderWidth: 1,
+                borderWidth: 2,
             },
         ],
     };
@@ -33,70 +33,78 @@ const SalesCategoryChart = () => {
     const options = {
         responsive: true,
         maintainAspectRatio: false,
+        cutout: '65%', // Thinner doughnut
         plugins: {
             legend: {
                 position: 'right',
                 labels: {
+                    usePointStyle: true,
+                    padding: 20,
                     font: {
                         family: "'Inter', sans-serif",
-                        size: 12
+                        size: 13,
+                        weight: '500' // Semi-bold
                     },
-                    usePointStyle: true,
+                    color: '#374151' // Gray-700
                 }
             },
             tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#111827',
+                bodyColor: '#4b5563',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 12,
+                boxPadding: 4,
+                titleFont: { family: "'Inter', sans-serif", size: 14, weight: 'bold' },
+                bodyFont: { family: "'Inter', sans-serif", size: 13 },
                 callbacks: {
                     label: function (context) {
-                        let label = context.label || '';
-                        if (label) {
-                            label += ': ';
-                        }
+                        const label = context.label || '';
                         const value = context.raw;
                         const total = context.chart._metasets[context.datasetIndex].total;
                         const percentage = Math.round((value / total) * 100) + '%';
-                        return label + value + ' (' + percentage + ')';
+                        return ` ${label}: ${value} (${percentage})`;
                     }
                 }
             }
         },
     };
 
-    // Custom plugin to draw percentage on chart segments
-    const percentagePlugin = {
-        id: 'percentagePlugin',
-        afterDatasetsDraw(chart, args, pluginOptions) {
-            const { ctx, data } = chart;
-            chart.data.datasets.forEach((dataset, i) => {
-                const meta = chart.getDatasetMeta(i);
-                meta.data.forEach((element, index) => {
-                    // Calculate percentage
-                    const value = dataset.data[index];
-                    const total = meta.total;
-                    const percentage = Math.round((value / total) * 100) + '%';
+    // Plugin to show text in center (optional)
+    const centerText = {
+        id: 'centerText',
+        beforeDraw: function (chart) {
+            const width = chart.width, height = chart.height, ctx = chart.ctx;
+            ctx.restore();
+            const fontSize = (height / 114).toFixed(2);
+            ctx.font = `bold ${fontSize}em Inter`;
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#374151";
 
-                    // Get position
-                    const { x, y } = element.tooltipPosition();
+            const text = "Sales",
+                textX = Math.round((width - ctx.measureText(text).width) / 2) - 40, // Offset for legend
+                textY = height / 2;
 
-                    // Style text
-                    ctx.save();
-                    ctx.fillStyle = '#fff';
-                    ctx.font = 'bold 12px Inter';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(percentage, x, y);
-                    ctx.restore();
-                });
-            });
+            ctx.save();
+            // Only draw if label is hidden or adjusted
+            // ctx.fillText(text, textX, textY); 
+            ctx.restore();
         }
     };
 
+
     return (
-        <div className="w-full h-full p-6 bg-white rounded-xl shadow-lg border flex flex-col">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Sales by Category</h2>
-            <div className="flex-1 min-h-0 flex items-center justify-center">
-                <div className="w-full h-full">
-                    <Doughnut data={data} options={options} plugins={[percentagePlugin]} />
-                </div>
+        <div className="w-full h-full p-6 bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col justify-between">
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold text-gray-800">Sales by Category</h2>
+                <select className="text-sm border-none bg-gray-50 text-gray-500 rounded-lg px-2 py-1 outline-none cursor-pointer hover:bg-gray-100 transition-colors">
+                    <option>This Week</option>
+                    <option>This Month</option>
+                </select>
+            </div>
+            <div className="flex-1 min-h-0 relative">
+                <Doughnut data={data} options={options} />
             </div>
         </div>
     );
